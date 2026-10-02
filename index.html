@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Домен занят. Котом.</title>
+<meta name="description" content="Сайт скоро будет готов. А пока можно потрогать кота.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23000'/%3E%3Cpath d='M7 11 9 5l7 5 7-5 2 6v10c0 8-18 8-18 0Z' fill='%23202127'/%3E%3Cpath d='M10 18h4m4 0h4' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:#000;color:#f4f3f5;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+main{min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:64px 24px;overflow:hidden}
+h1{font-size:clamp(30px,4vw,48px);line-height:1.16;letter-spacing:-1.8px;font-weight:600;margin:0 0 16px;max-width:760px}
+p{font-size:18px;line-height:1.6;color:#8c8991;margin:0}
+.cat-scene{position:relative;width:min(560px,100%);margin-top:136px;isolation:isolate}
+.cat{display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;transform-origin:50% 85%;animation:breathe 4.6s ease-in-out infinite;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.cat:focus-visible{outline:2px solid #a68bdc;outline-offset:18px;border-radius:32px}
+.cat img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none;filter:brightness(1.2)}
+.cat.petting{animation:pet 1.4s ease-in-out infinite}
+.cat.grumble{animation:grumble .7s ease-in-out both}
+.cat.startled{animation:startled .85s ease-in-out both}
+.cat.doze{animation:doze 1s ease-in-out both}
+.speech{position:absolute;bottom:calc(100% - 24px);width:min(280px,90%);z-index:2;pointer-events:none}
+.speech[hidden]{display:none}
+.speech[data-place="right"]{right:0}
+.speech[data-place="left"]{left:0}
+.speech[data-place="center"]{left:50%;transform:translateX(-50%)}
+.bubble{--tilt:-3deg;position:relative;border:1px solid #44404b;background:#18161b;color:#efedf2;border-radius:19px;padding:17px 21px;font-size:17px;line-height:1.4;text-align:left;box-shadow:0 8px 24px #0009;transform-origin:75% 100%;transform:rotate(var(--tilt))}
+.bubble:after{content:'';position:absolute;right:35px;bottom:-7px;width:13px;height:13px;background:#18161b;border-right:1px solid #44404b;border-bottom:1px solid #44404b;transform:rotate(45deg)}
+.speech[data-place="left"] .bubble{--tilt:3deg}
+.speech[data-place="center"] .bubble{--tilt:-1deg}
+.bubble.enter{animation:pop .45s cubic-bezier(.22,.7,.3,1) both}
+.bubble.leaving{animation:away .28s ease-in both}
+@keyframes breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-3px) scaleY(1.025)}}
+@keyframes pet{0%,100%{transform:translateY(0) rotate(0)}28%{transform:translateY(-6px) rotate(1.5deg) scaleY(1.03)}62%{transform:translateY(-2px) rotate(-.8deg)}}
+@keyframes grumble{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px) rotate(-1deg)}50%{transform:translateX(4px) rotate(1deg)}75%{transform:translateX(-2px)}}
+@keyframes startled{0%,100%{transform:translateY(0)}32%{transform:translateY(-13px) rotate(-2deg)}64%{transform:translateY(-2px) rotate(1deg)}}
+@keyframes doze{0%,100%{transform:scaleY(1)}45%{transform:scaleY(.96) rotate(-1deg)}}
+@keyframes pop{0%{opacity:0;transform:translateY(14px) rotate(0) scale(.85)}65%{opacity:1;transform:translateY(-3px) rotate(var(--tilt)) scale(1.025)}100%{opacity:1;transform:translateY(0) rotate(var(--tilt)) scale(1)}}
+@keyframes away{to{opacity:0;transform:translateY(-8px) rotate(var(--tilt)) scale(.96)}}
+@media(max-width:600px){main{padding:48px 24px}h1{font-size:32px;letter-spacing:-1px;max-width:340px}p{font-size:16px}.cat-scene{margin-top:136px;max-width:420px}.bubble{font-size:16px;padding:14px 18px}.speech{width:min(260px,90%)}}
+@media(prefers-reduced-motion:reduce){.cat,.cat.petting,.cat.grumble,.cat.startled,.cat.doze,.bubble.enter,.bubble.leaving{animation:none}.bubble.leaving{opacity:0}}
+</style>
+</head>
+<body>
+<main>
+<h1>Сайт скоро будет готов.</h1>
+<p>А пока можно потрогать кота.</p>
+<div class="cat-scene" id="scene">
+<div class="speech" id="speech" data-place="right" hidden><div class="bubble" id="bubble" role="status" aria-live="polite" aria-atomic="true"></div></div>
+<button class="cat" id="cat" aria-label="Погладить кота">
+<img src="cat.webp" width="1000" height="479" alt="Спящий чёрный кот" fetchpriority="high">
+</button>
+</div>
+</main>
+<script>
+const cat=document.getElementById('cat');
+const speech=document.getElementById('speech');
+const bubble=document.getElementById('bubble');
+const excuses=[["Ау. Это кот, а не кнопка.", "startled"], ["Вы разбудили меня. Теперь мы оба ничего не делаем.", "grumble"], ["Я спал до того, как это стало заглушкой.", "doze"], ["Так. А разрешение от кота?", "grumble"], ["Не тыкай. Я запоминаю лица.", "grumble"], ["Сайт строится. Я лежусь.", "doze"], ["Я не завис. Я свернулся.", "doze"], ["Ещё один клик — и вы мой будильник.", "startled"], ["Пять минут. Это было пять минут назад.", "doze"], ["Запуск? Мне послышалось «завтрак».", "startled"], ["Сроки уточняйте у миски.", "doze"], ["Меня наняли лежать. Я справляюсь.", "doze"], ["Я бы помог. Но я уже лёг.", "doze"], ["Сайт скоро. Я — вряд ли.", "doze"], ["Вы точно сюда за сайтом?", "grumble"], ["Перерыв технический. Сон настоящий.", "doze"], ["Тут было свободно. Теперь моё.", "grumble"], ["Погладить можно. Торопить нельзя.", "grumble"], ["Я уже нажал «отложить».", "doze"], ["Доставка кота выполнена. Остальное в пути.", "startled"], ["Проснулся. Осудил. Сплю дальше.", "grumble"], ["Мяу не является согласием на запуск.", "grumble"], ["Вкладку можете закрыть. Меня не будите.", "doze"], ["Если что, я тут главный по ничего.", "doze"]];
+const petReplies=[["Вот так. Без этих ваших кликов.", "petting"], ["Правее. Нет, ваше правее.", "petting"], ["Уже уходите? Лапу с мышки уберите.", "petting"], ["Мур. Ладно, вы в белом списке.", "petting"], ["Вот бы сайт сам себя так собирал.", "petting"], ["У вас талант. Работайте дальше.", "petting"], ["Почесали кота. Интернет пройден.", "petting"], ["Только не живот. Мы ещё мало знакомы.", "petting"]];
+const reactions=['petting','grumble','startled','doze'];
+let reactionTimer,hideTimer,removeTimer,lastPoint=null,distance=0,lastMotion=0,lastReply=-Infinity;
+let clickDeck=[],petDeck=[],previousReply='',place=0;
+function nextReply(pool,deck){
+  if(!deck.length){
+    deck.push(...pool);
+    for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+    if(deck[deck.length-1][0]===previousReply)[deck[0],deck[deck.length-1]]=[deck[deck.length-1],deck[0]];
+  }
+  return deck.pop();
+}
+function animate(kind){
+  clearTimeout(reactionTimer);
+  if(!cat.classList.contains(kind)){cat.classList.remove(...reactions);cat.classList.add(kind);}
+  reactionTimer=setTimeout(()=>cat.classList.remove(...reactions),kind==='petting'?850:1100);
+}
+function say(reply){
+  clearTimeout(hideTimer);clearTimeout(removeTimer);
+  previousReply=reply[0];
+  speech.hidden=false;
+  speech.dataset.place=['right','center','left'][place++%3];
+  bubble.textContent=reply[0];
+  bubble.classList.remove('enter','leaving');void bubble.offsetWidth;bubble.classList.add('enter');
+  animate(reply[1]);lastReply=performance.now();
+  hideTimer=setTimeout(()=>{
+    bubble.classList.remove('enter');bubble.classList.add('leaving');
+    removeTimer=setTimeout(()=>{speech.hidden=true;bubble.textContent='';},300);
+  },6000);
+}
+function pet(clicked=false){
+  if(clicked){say(nextReply(excuses,clickDeck));return;}
+  animate('petting');
+  if(performance.now()-lastReply>6500)say(nextReply(petReplies,petDeck));
+}
+cat.addEventListener('click',()=>pet(true));
+cat.addEventListener('pointerenter',event=>{lastPoint={x:event.clientX,y:event.clientY};distance=0;});
+cat.addEventListener('pointermove',event=>{
+  if(event.pointerType==='touch')return;
+  if(lastPoint)distance+=Math.hypot(event.clientX-lastPoint.x,event.clientY-lastPoint.y);
+  lastPoint={x:event.clientX,y:event.clientY};
+  const now=performance.now();
+  if(distance>=8 && now-lastMotion>=150){distance=0;lastMotion=now;pet();}
+});
+cat.addEventListener('pointerleave',()=>{lastPoint=null;distance=0;});
+</script>
+</body>
+</html>
